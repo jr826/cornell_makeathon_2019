@@ -1,0 +1,47 @@
+# storage variables, don't want to reset them each time
+# loop runs
+count = 0
+toggle = False
+
+# arduino loop, runs continuously 
+def loop() :
+  # array to store accelerations  
+  acc[3] = {}
+  # get acceleration values from the accelerometer
+  rc = KX126.get_val(acc)
+  # x,y,z represent accelerations in those directions
+  x = acc[0]  
+  y = acc[1]
+  z = acc[2]
+  magnitude = abs( sqrt( x^2 + y^2 + z^2 ) )
+  cmp = 2.0 / magnitude
+  # if lights off and time to change, turn them on
+  if count > cmp and !toggle :
+    light_on()
+    count = 0
+    toggle = !toggle
+  # if lights on and time to change, turn them off
+  else if count > cmp and toggle :
+    light_off()  
+    count = 0
+    toggle = !toggle
+  # increment count each time the loop ends
+  count++
+
+# turns on specified LEDs
+def light_on () :
+  # i represents the individual pixel, R,G,B, are 
+  # between 0 and 255 to represent color of the pixel
+  # this function is called on different values and ranges
+  # of i to light the appropriate pixels
+  strip.setPixelColor(i, R, G, B)
+  # show is called to update the strip with the colors we set
+  strip.show()
+
+def light_off () :
+  # use setPixelColor to make all pixels R,G,B = 0 (OFF)
+  # call show to update strip
+  while i < number_of_pixels :
+    strip.setPixelColor(i, 0, 0, 0)
+    strip.show()
+    i++
